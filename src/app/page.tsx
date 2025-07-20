@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   Camera,
   Download,
-  Wand2,
   Type,
   Undo2,
   Loader,
@@ -16,7 +15,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { useToast } from "@/hooks/use-toast";
-import { dreamifyPhoto } from "@/ai/flows/dreamify-photo";
 import { cn } from "@/lib/utils";
 
 const FILTERS = [
@@ -42,10 +40,8 @@ export default function Home() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const [imageSrc, setImageSrc] = useState<string | null>(null);
-  const [dreamifiedImageSrc, setDreamifiedImageSrc] = useState<string | null>(null);
   
   const [isCameraReady, setIsCameraReady] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [isTextEditing, setIsTextEditing] = useState(false);
   
   const [filterClass, setFilterClass] = useState<FilterClass>("");
@@ -91,38 +87,18 @@ export default function Home() {
         context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
         const dataUrl = canvas.toDataURL("image/jpeg");
         setImageSrc(dataUrl);
-        setDreamifiedImageSrc(null); // Reset dreamified image
       }
     }
   };
 
   const handleRetake = () => {
     setImageSrc(null);
-    setDreamifiedImageSrc(null);
     setFilterClass("");
     setIsCameraReady(false);
   };
 
-  const handleDreamify = async () => {
-    if (!imageSrc) return;
-    setIsLoading(true);
-    try {
-      const result = await dreamifyPhoto({ photoDataUri: imageSrc });
-      setDreamifiedImageSrc(result.dreamifiedPhotoDataUri);
-    } catch (error) {
-      console.error("Dreamify failed:", error);
-      toast({
-        variant: "destructive",
-        title: "Dreamify Failed",
-        description: "Something went wrong while creating your dream photo.",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const handleDownload = () => {
-    const imageToDraw = dreamifiedImageSrc || imageSrc;
+    const imageToDraw = imageSrc;
     if (!imageToDraw) return;
   
     const canvas = document.createElement('canvas');
@@ -231,13 +207,7 @@ export default function Home() {
       <div className="w-full lg:w-1/2 flex-shrink-0">
         <div className="bg-[#fdfdfc] p-4 pb-6 shadow-2xl rounded-sm transform -rotate-2">
             <div className={cn("relative w-full aspect-square bg-black overflow-hidden", filterClass)}>
-                {isLoading && (
-                    <div className="absolute inset-0 bg-background/50 flex flex-col items-center justify-center z-20">
-                    <Wand2 className="h-10 w-10 animate-pulse text-primary-foreground" />
-                    <p className="mt-2 text-primary-foreground">Dreamifying...</p>
-                    </div>
-                )}
-                <img src={dreamifiedImageSrc || imageSrc!} alt="Snapshot" className="w-full h-full object-cover" />
+                <img src={imageSrc!} alt="Snapshot" className="w-full h-full object-cover" />
             </div>
             <div className="mt-4 h-[60px] flex items-center justify-center">
                 {isTextEditing ? (
@@ -294,14 +264,6 @@ export default function Home() {
             </div>
         </div>
         
-        <div>
-          <h3 className="font-headline text-2xl mb-2">Magic</h3>
-          <Button onClick={handleDreamify} className="w-full" disabled={isLoading}>
-            <Wand2 className="mr-2" />
-            Dreamify with AI
-          </Button>
-        </div>
-
         <div className="flex flex-col sm:flex-row gap-4">
             <Button onClick={handleRetake} variant="outline" className="w-full">
                 <Undo2 className="mr-2" /> Retake

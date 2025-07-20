@@ -1,4 +1,10 @@
 "use client";
-import { GenkitProvider } from "@genkit-ai/next";
 
-export default GenkitProvider;
+// This is a placeholder file.
+export default function GenkitProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return <>{children}</>;
+}
