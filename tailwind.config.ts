@@ -10,8 +10,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        body: ['Inter', 'sans-serif'],
-        headline: ['Inter', 'sans-serif'],
+        body: ["'Special Elite'", 'cursive'],
+        headline: ["'Special Elite'", 'cursive'],
         code: ['monospace'],
       },
       colors: {
