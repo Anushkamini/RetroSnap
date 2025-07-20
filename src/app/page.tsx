@@ -84,9 +84,17 @@ export default function Home() {
       if (context) {
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
+        
+        // Flip the canvas horizontally
+        context.translate(video.videoWidth, 0);
+        context.scale(-1, 1);
+        
         context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
         const dataUrl = canvas.toDataURL("image/jpeg");
         setImageSrc(dataUrl);
+
+        // Reset the transform
+        context.setTransform(1, 0, 0, 1, 0, 0);
       }
     }
   };
@@ -186,7 +194,7 @@ export default function Home() {
           autoPlay
           playsInline
           muted
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover transform -scale-x-100"
         />
         {!isCameraReady && (
           <div className="absolute inset-0 flex items-center justify-center bg-background/80">
