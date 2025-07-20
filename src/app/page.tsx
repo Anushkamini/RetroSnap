@@ -12,6 +12,8 @@ import {
   Minus,
   MoveLeft,
   MoveRight,
+  MoveUp,
+  MoveDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -51,6 +53,7 @@ export default function Home() {
   const [text, setText] = useState("RetroSnap");
   const [textSize, setTextSize] = useState(24);
   const [textX, setTextX] = useState(0);
+  const [textY, setTextY] = useState(0);
 
   useEffect(() => {
     async function setupCamera() {
@@ -176,8 +179,8 @@ export default function Home() {
         ctx.font = `${textSize * 2}px 'Special Elite', cursive`; // Increase size for higher res canvas
         ctx.textAlign = 'center';
         const textXPosition = polaroidWidth / 2 + textX * 2; // Apply horizontal shift
-        const textY = padding + imageHeight + (textSpace / 2) + (textSize);
-        ctx.fillText(text, textXPosition, textY);
+        const textYPosition = padding + imageHeight + (textSpace / 2) + (textSize) + textY * 2; // Apply vertical shift
+        ctx.fillText(text, textXPosition, textYPosition);
       }
   
       // Trigger download
@@ -235,7 +238,7 @@ export default function Home() {
                     </div>
                 ) : (
                     <button onClick={() => setIsTextEditing(true)} className="w-full h-full">
-                        <p className="text-center text-muted-foreground font-body" style={{ fontSize: `${textSize}px`, transform: `translateX(${textX}px)` }}>
+                        <p className="text-center text-muted-foreground font-body" style={{ fontSize: `${textSize}px`, transform: `translate(${textX}px, ${textY}px)` }}>
                             {text || "Click to add text"}
                         </p>
                     </button>
@@ -278,17 +281,31 @@ export default function Home() {
               </div>
             </div>
             <div>
-              <label className="text-sm text-muted-foreground">Position</label>
+              <label className="text-sm text-muted-foreground">Horizontal Position</label>
               <div className="flex items-center gap-4">
-                <Button variant="outline" size="icon" onClick={() => setTextX(x => Math.max(-100, x - 5))}><MoveLeft className="h-4 w-4"/></Button>
+                <Button variant="outline" size="icon" onClick={() => setTextX(x => Math.max(-150, x - 10))}><MoveLeft className="h-4 w-4"/></Button>
                 <Slider
                   value={[textX]}
                   onValueChange={(value) => setTextX(value[0])}
-                  min={-100}
-                  max={100}
+                  min={-150}
+                  max={150}
                   step={1}
                 />
-                <Button variant="outline" size="icon" onClick={() => setTextX(x => Math.min(100, x + 5))}><MoveRight className="h-4 w-4"/></Button>
+                <Button variant="outline" size="icon" onClick={() => setTextX(x => Math.min(150, x + 10))}><MoveRight className="h-4 w-4"/></Button>
+              </div>
+            </div>
+             <div>
+              <label className="text-sm text-muted-foreground">Vertical Position</label>
+              <div className="flex items-center gap-4">
+                <Button variant="outline" size="icon" onClick={() => setTextY(y => Math.max(-50, y - 5))}><MoveUp className="h-4 w-4"/></Button>
+                <Slider
+                  value={[textY]}
+                  onValueChange={(value) => setTextY(value[0])}
+                  min={-50}
+                  max={50}
+                  step={1}
+                />
+                <Button variant="outline" size="icon" onClick={() => setTextY(y => Math.min(50, y + 5))}><MoveDown className="h-4 w-4"/></Button>
               </div>
             </div>
         </div>
