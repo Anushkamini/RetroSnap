@@ -14,6 +14,7 @@ import {
   MoveRight,
   MoveUp,
   MoveDown,
+  Upload,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -42,6 +43,7 @@ export default function Home() {
   const { toast } = useToast();
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   
@@ -109,6 +111,21 @@ export default function Home() {
     setImageSrc(null);
     setFilterClass("");
     setIsCameraReady(false);
+  };
+
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setImageSrc(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleDownload = () => {
@@ -209,10 +226,23 @@ export default function Home() {
           </div>
         )}
       </div>
-      <Button onClick={takeSnapshot} size="lg" className="w-full" disabled={!isCameraReady}>
-        <Camera className="mr-2" />
-        Capture Snapshot
-      </Button>
+      <div className="w-full flex flex-col gap-2">
+        <Button onClick={takeSnapshot} size="lg" className="w-full" disabled={!isCameraReady}>
+          <Camera className="mr-2" />
+          Capture Snapshot
+        </Button>
+        <Button onClick={handleUploadClick} size="lg" variant="secondary" className="w-full">
+            <Upload className="mr-2" />
+            Upload Photo
+        </Button>
+        <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            className="hidden"
+            accept="image/*"
+        />
+      </div>
     </div>
   );
 
